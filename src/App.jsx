@@ -159,11 +159,11 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
           )
         ) : (
           isWord ? (
-            <div style={{ color: "#86efac", fontSize: 52, fontWeight: 900 }}>{problem.wordAnswer}</div>
+            <div style={{ color: "#1a5c2a", fontSize: 52, fontWeight: 900 }}>{problem.wordAnswer}</div>
           ) : problem.answerPhoto ? (
             <img src={problem.answerPhoto} alt="答え" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#86efac", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.memo || "（答えが登録されていません）"}
             </div>
           )
@@ -217,11 +217,11 @@ function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
           )
         ) : (
           isWord ? (
-            <div style={{ color: "#86efac", fontSize: 36, fontWeight: 900 }}>{problem.wordAnswer}</div>
+            <div style={{ color: "#1a5c2a", fontSize: 36, fontWeight: 900 }}>{problem.wordAnswer}</div>
           ) : problem.answerPhoto ? (
             <img src={problem.answerPhoto} alt="答え" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#86efac", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.memo || "（答えが登録されていません）"}
             </div>
           )
