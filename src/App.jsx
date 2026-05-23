@@ -296,7 +296,7 @@ function SubjectSourceRow({ form, setForm }) {
   );
 }
 
-function WordForm({ form, setForm, isEnglish }) {
+function WordForm({ form, setForm, isEnglish, formMode }) {
   const [aiState, setAiState] = useState("idle");
   const handleAiConvert = async () => {
     if (!form.wordAnswer) return;
@@ -324,14 +324,6 @@ function WordForm({ form, setForm, isEnglish }) {
       <div style={{ fontSize: 12, fontWeight: 700, color: ac, marginBottom: 14 }}>
         {isEnglish ? "🔤 英単語登録" : "🖊️ 漢字登録"}
       </div>
-      <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-          {"答え（" + (isEnglish ? "英単語" : "漢字") + "）"}
-        </label>
-        <input value={form.wordAnswer} onChange={e => setForm(f => ({ ...f, wordAnswer: e.target.value }))}
-          placeholder={isEnglish ? "例: registration" : "例: 漢字"}
-          style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e2e8f0",
-            fontSize: 16, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", fontWeight: 700 }} />
       </div>
       <div style={{ marginBottom: 10 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
@@ -342,6 +334,14 @@ function WordForm({ form, setForm, isEnglish }) {
           style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid " + bc,
             fontSize: 15, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", color: ac }} />
         <div style={{ fontSize: 11, color: lc, marginTop: 3 }}>💡 キーボードで直接入力できます</div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
+          {"答え（" + (isEnglish ? "英単語" : "漢字") + "）"}
+        </label>
+        <input value={form.wordAnswer} onChange={e => setForm(f => ({ ...f, wordAnswer: e.target.value }))}
+          placeholder={isEnglish ? "例: registration" : "例: 漢字"}
+          style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e2e8f0",
+            fontSize: 16, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", fontWeight: 700 }} />
       </div>
       <div style={{ borderTop: "1px solid " + bc, paddingTop: 10 }}>
         <button onClick={handleAiConvert} disabled={aiState === "loading" || !form.wordAnswer}
@@ -467,8 +467,8 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
       )}
       {formMode === "kanji" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
       {formMode === "english" && <WordForm form={form} setForm={setForm} isEnglish={true} />}
-        {formMode === "science" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} />}
-        {formMode === "social" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} />}
+        {formMode === "science" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} formMode={formMode} />}
+        {formMode === "social" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} formMode={formMode} />}
       {formMode === "problem" ? <SubjectSourceRow form={form} setForm={setForm} /> : <SubjectRow form={form} setForm={setForm} />}
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>間違えた日</label>
