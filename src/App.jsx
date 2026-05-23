@@ -668,6 +668,7 @@ export default function App() {
   const [sortKey, setSortKey] = useState("random");
   const [editId, setEditId] = useState(null);
   const [flashCard, setFlashCard] = useState(null);
+  const [toast, setToast] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [isTablet, setIsTablet] = useState(window.innerWidth >= 768);
 
