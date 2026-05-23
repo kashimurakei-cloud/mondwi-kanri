@@ -16,13 +16,7 @@ const db = getFirestore(app);
 const DOC_ID = "shared";
 
 async function saveProblems(problems) {
-  try {
-    console.log("Saving to Firestore...");
-    await setDoc(doc(db, "mondai", DOC_ID), { problems: JSON.stringify(problems) });
-    console.log("Saved successfully!");
-  } catch(e) {
-    console.error("Save error:", e.message);
-  }
+  await setDoc(doc(db, "mondai", DOC_ID), { problems: JSON.stringify(problems) });
 }
 async function loadProblems() {
   const snap = await getDoc(doc(db, "mondai", DOC_ID));
@@ -42,8 +36,6 @@ const MODES = [
   { key: "problem", label: "📝 問題",   desc: "計算・読解など" },
   { key: "kanji",   label: "🖊️ 漢字",   desc: "漢字の読み書き" },
   { key: "english", label: "🔤 英単語", desc: "英単語・意味" },
-  { key: "science", label: "理科", desc: "理科の問題" },
-  { key: "social", label: "社会", desc: "社会の問題" },
 ];
 const IMPORTANCE = [
   { key: 1, label: "★",   desc: "普通",   color: "#94a3b8" },
@@ -112,17 +104,17 @@ function StatusBadge({ status, onClick, small }) {
   );
 }
 
-function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview }) {
+function FlashPanel({ problem, onClose, onCycleStatus, onIncrementReview }) {
   const [phase, setPhase] = useState(0);
-  const isWord = problem.mode === "kanji" || problem.mode === "english" || problem.mode === "science" || problem.mode === "social";
+  const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   const st = STATUSES.find(s => s.key === problem.status) || STATUSES[0];
-  
+  useEffect(() => { setPhase(0); }, [problem.id]);
   return (
     <div style={{
       width: "100%", height: "100%", borderRadius: 20, overflow: "hidden",
-      background: "#ffffff", color: "#1a1a1a",
-      display: "flex", flexDirection: "column", transition: "none",
+      background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
+      display: "flex", flexDirection: "column", transition: "background .3s",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: "rgba(0,0,0,0.2)" }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -145,27 +137,27 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
       <div style={{ textAlign: "center", padding: "12px 0 0", fontSize: 12, color: "rgba(255,255,255,0.45)", letterSpacing: 3 }}>
         {phase === 0 ? "── 問 題 ──" : "── 答 え ──"}
       </div>
-      <div onClick={() => setPhase(ph => { if (ph === 0) return 1; onNext ? onNext() : onClose(); return 0; })}
+      <div onClick={() => setPhase(ph => ph === 0 ? 1 : 0)}
         style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, cursor: "pointer", textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
-            <div style={{ color: "#1a1a1a", fontSize: 40, fontWeight: 800, lineHeight: 1.5 }}>
+            <div style={{ color: "#fff", fontSize: 40, fontWeight: 800, lineHeight: 1.5 }}>
               {problem.wordQuestion || "（読みを登録してください）"}
             </div>
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#1a5c2a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#fff", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
         ) : (
           isWord ? (
-            <div style={{ color: "#1a5c2a", fontSize: 52, fontWeight: 900 }}>{problem.wordAnswer}</div>
+            <div style={{ color: "#86efac", fontSize: 52, fontWeight: 900 }}>{problem.wordAnswer}</div>
           ) : problem.answerPhoto ? (
             <img src={problem.answerPhoto} alt="答え" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#1a5c2a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#86efac", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.memo || "（答えが登録されていません）"}
             </div>
           )
@@ -178,17 +170,16 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
   );
 }
 
-function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
+function FlashCard({ problem, onClose, onReviewCountUp }) {
   const [phase, setPhase] = useState(0);
-  
-  const isWord = problem.mode === "kanji" || problem.mode === "english" || problem.mode === "science" || problem.mode === "social";
+  const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   return (
-    <div onClick={() => { if (phase === 0) { setPhase(1); } else { onNext ? onNext() : onClose(); } }} style={{
+    <div onClick={() => { if (phase === 0) { setPhase(1); } else { onClose(); } }} style={{
       position: "fixed", inset: 0, zIndex: 2000,
-      background: "#ffffff", color: "#1a1a1a",
+      background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      padding: 24, cursor: "pointer", transition: "none",
+      padding: 24, cursor: "pointer", transition: "background .3s",
     }}>
       <button onClick={e => { e.stopPropagation(); onClose(); }}
         style={{ ...B, position: "absolute", top: 20, right: 20, background: "rgba(255,255,255,0.15)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>✕ 閉じる</button>
@@ -207,23 +198,23 @@ function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
       <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
-            <div style={{ color: "#1a1a1a", fontSize: 28, fontWeight: 800, lineHeight: 1.5 }}>
+            <div style={{ color: "#fff", fontSize: 28, fontWeight: 800, lineHeight: 1.5 }}>
               {problem.wordQuestion || "（読みを登録してください）"}
             </div>
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "50vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#1a5c2a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#fff", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
         ) : (
           isWord ? (
-            <div style={{ color: "#1a5c2a", fontSize: 36, fontWeight: 900 }}>{problem.wordAnswer}</div>
+            <div style={{ color: "#86efac", fontSize: 36, fontWeight: 900 }}>{problem.wordAnswer}</div>
           ) : problem.answerPhoto ? (
             <img src={problem.answerPhoto} alt="答え" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#1a5c2a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#86efac", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.memo || "（答えが登録されていません）"}
             </div>
           )
@@ -296,7 +287,7 @@ function SubjectSourceRow({ form, setForm }) {
   );
 }
 
-function WordForm({ form, setForm, isEnglish, formMode }) {
+function WordForm({ form, setForm, isEnglish }) {
   const [aiState, setAiState] = useState("idle");
   const handleAiConvert = async () => {
     if (!form.wordAnswer) return;
@@ -324,6 +315,14 @@ function WordForm({ form, setForm, isEnglish, formMode }) {
       <div style={{ fontSize: 12, fontWeight: 700, color: ac, marginBottom: 14 }}>
         {isEnglish ? "🔤 英単語登録" : "🖊️ 漢字登録"}
       </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
+          {"答え（" + (isEnglish ? "英単語" : "漢字") + "）"}
+        </label>
+        <input value={form.wordAnswer} onChange={e => setForm(f => ({ ...f, wordAnswer: e.target.value }))}
+          placeholder={isEnglish ? "例: registration" : "例: 漢字"}
+          style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e2e8f0",
+            fontSize: 16, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", fontWeight: 700 }} />
       </div>
       <div style={{ marginBottom: 10 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
@@ -334,14 +333,6 @@ function WordForm({ form, setForm, isEnglish, formMode }) {
           style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid " + bc,
             fontSize: 15, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", color: ac }} />
         <div style={{ fontSize: 11, color: lc, marginTop: 3 }}>💡 キーボードで直接入力できます</div>
-      <div style={{ marginBottom: 12 }}>
-        <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-          {"答え（" + (isEnglish ? "英単語" : "漢字") + "）"}
-        </label>
-        <input value={form.wordAnswer} onChange={e => setForm(f => ({ ...f, wordAnswer: e.target.value }))}
-          placeholder={isEnglish ? "例: registration" : "例: 漢字"}
-          style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e2e8f0",
-            fontSize: 16, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", fontWeight: 700 }} />
       </div>
       <div style={{ borderTop: "1px solid " + bc, paddingTop: 10 }}>
         <button onClick={handleAiConvert} disabled={aiState === "loading" || !form.wordAnswer}
@@ -467,8 +458,6 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
       )}
       {formMode === "kanji" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
       {formMode === "english" && <WordForm form={form} setForm={setForm} isEnglish={true} />}
-        {formMode === "science" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} formMode={formMode} />}
-        {formMode === "social" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} formMode={formMode} />}
       {formMode === "problem" ? <SubjectSourceRow form={form} setForm={setForm} /> : <SubjectRow form={form} setForm={setForm} />}
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>間違えた日</label>
@@ -531,7 +520,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
       <div style={{ background: "#fff", borderRadius: 14, padding: 12, marginBottom: 14, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>フィルター／ソート</div>
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 7 }}>
-          {[["全て","全て"],["problem","📝"],["kanji","🖊️"],["english","🔤"],["science","🔬理科"],["social","🌏社会"]].map(([k,l]) => (
+          {[["全て","全て"],["problem","📝"],["kanji","🖊️"],["english","🔤"]].map(([k,l]) => (
             <button key={k} onClick={() => setFilterMode(k)}
               style={{ ...B, padding: "4px 10px", borderRadius: 999, fontSize: 11, border: "1px solid",
                 background: filterMode===k?"#334155":"#f1f5f9", color: filterMode===k?"#fff":"#475569",
@@ -556,7 +545,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
         </div>
         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
           <span style={{ fontSize: 11, color: "#94a3b8" }}>並替:</span>
-          {[["date","日付"],["importance","重要度"],["status","状態"],["random","🔀ランダム"]].map(([k,l]) => (
+          {[["date","日付"],["importance","重要度"],["status","状態"]].map(([k,l]) => (
             <button key={k} onClick={() => setSortKey(k)}
               style={{ ...B, padding: "4px 10px", borderRadius: 999, fontSize: 11, border: "1px solid",
                 background: sortKey===k?"#475569":"#f1f5f9", color: sortKey===k?"#fff":"#475569",
@@ -573,7 +562,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
         </div>
       )}
       {storageReady && filtered.map(p => {
-        const isWord = p.mode === "kanji" || p.mode === "english" || p.mode === "science" || p.mode === "social";
+        const isWord = p.mode === "kanji" || p.mode === "english";
         const statusColor = STATUSES.find(s => s.key === p.status)?.color || "#e2e8f0";
         const imp = IMPORTANCE.find(i => i.key === (p.importance || 1));
         const modeIcon = p.mode === "kanji" ? "🖊️" : p.mode === "english" ? "🔤" : "📝";
@@ -669,10 +658,9 @@ export default function App() {
   const [filterSubject, setFilterSubject] = useState("全て");
   const [filterStatus, setFilterStatus] = useState("完了以外");
   const [filterMode, setFilterMode] = useState("全て");
-  const [sortKey, setSortKey] = useState("random");
+  const [sortKey, setSortKey] = useState("date");
   const [editId, setEditId] = useState(null);
   const [flashCard, setFlashCard] = useState(null);
-  const [toast, setToast] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [isTablet, setIsTablet] = useState(window.innerWidth >= 768);
 
@@ -696,19 +684,19 @@ export default function App() {
     return () => clearTimeout(t);
   }, [problems, storageReady]);
 
-  const wordForm = formMode === "kanji" ? kanjiForm : formMode === "science" || formMode === "social" ? kanjiForm : englishForm;
-  const setWordForm = formMode === "kanji" ? setKanjiForm : formMode === "science" || formMode === "social" ? setKanjiForm : setEnglishForm;
+  const wordForm = formMode === "kanji" ? kanjiForm : englishForm;
+  const setWordForm = formMode === "kanji" ? setKanjiForm : setEnglishForm;
 
   const handleSave = () => {
     const form = formMode === "problem" ? problemForm : wordForm;
     if (!form.subject) return alert("科目を選んでください");
     if (formMode === "problem" && !form.source) return alert("出どころを選んでください");
-    if ((formMode === "kanji" || formMode === "english" || formMode === "science" || formMode === "social") && !form.wordAnswer) return alert("答えを入力してください");
+    if ((formMode === "kanji" || formMode === "english") && !form.wordAnswer) return alert("答えを入力してください");
     const entry = { ...form, id: editId !== null ? editId : Date.now() };
     if (editId !== null) { setProblems(ps => ps.map(p => p.id === editId ? entry : p)); setEditId(null); }
     else { setProblems(ps => [...ps, entry]); setSelectedId(entry.id); }
     setProblemForm(initialProblemForm); setKanjiForm(initialKanjiForm); setEnglishForm(initialEnglishForm);
-    setView("add"); window.scrollTo(0, 0); document.querySelectorAll("[style*=overflowY]").forEach(el => el.scrollTop = 0);
+    setView("list");
   };
   const handleEdit = (p) => {
     const m = p.mode || "problem"; setFormMode(m);
@@ -742,7 +730,6 @@ export default function App() {
     if (sortKey === "date") list.sort((a,b) => b.date.localeCompare(a.date));
     if (sortKey === "importance") list.sort((a,b) => (b.importance||1)-(a.importance||1));
     if (sortKey === "status") list.sort((a,b) => STATUSES.findIndex(s=>s.key===a.status)-STATUSES.findIndex(s=>s.key===b.status));
-    if (sortKey === 'random') list.sort(() => Math.random() - 0.5);
     return list;
   }, [problems, filterSubject, filterStatus, filterMode, sortKey]);
 
@@ -834,7 +821,7 @@ export default function App() {
           </div>
           <div style={{ flex:1, padding:20, overflow:"hidden" }}>
             {selectedProblem ? (
-              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onNext={() => { const idx = filtered.findIndex(p => p.id === selectedId); const next = filtered[idx + 1]; if (next) setSelectedId(next.id); else setSelectedId(null); }} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
+              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
             ) : (
               <div style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
                 <div style={{ textAlign:"center", color:"#94a3b8" }}>
@@ -852,7 +839,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif", minHeight:"100vh", background:"#f8fafc" }}>
-      {flashCard && <FlashCard key={flashCard.id} problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = filtered.findIndex(p => p.id === flashCard.id); const next = filtered[idx + 1]; if (next) setFlashCard(next); else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
+      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onReviewCountUp={incrementReview} />}
       {header}
       {tabs}
       {view==="add" && <div style={{ maxWidth:480, margin:"0 auto" }}><AddForm {...addFormProps} /></div>}
