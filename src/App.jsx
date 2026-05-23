@@ -43,6 +43,10 @@ const MODES = [
   { key: "kanji",   label: "🖊️ 漢字",   desc: "漢字の読み書き" },
   { key: "english", label: "🔤 英単語", desc: "英単語・意味" },
 ];
+const MODES2 = [
+  { key: "science", label: "🔬 理科",   desc: "理科の問題" },
+  { key: "social",  label: "🌏 社会",   desc: "社会の問題" },
+];
 const IMPORTANCE = [
   { key: 1, label: "★",   desc: "普通",   color: "#94a3b8" },
   { key: 2, label: "★★",  desc: "重要",   color: "#f59e0b" },
@@ -112,7 +116,7 @@ function StatusBadge({ status, onClick, small }) {
 
 function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview }) {
   const [phase, setPhase] = useState(0);
-  const isWord = problem.mode === "kanji" || problem.mode === "english";
+  const isWord = problem.mode === "kanji" || problem.mode === "english" || problem.mode === "science" || problem.mode === "social";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   const st = STATUSES.find(s => s.key === problem.status) || STATUSES[0];
   
@@ -179,7 +183,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
 function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
   const [phase, setPhase] = useState(0);
   
-  const isWord = problem.mode === "kanji" || problem.mode === "english";
+  const isWord = problem.mode === "kanji" || problem.mode === "english" || problem.mode === "science" || problem.mode === "social";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   return (
     <div onClick={() => { if (phase === 0) { setPhase(1); } else { onNext ? onNext() : onClose(); } }} style={{
@@ -322,6 +326,14 @@ function WordForm({ form, setForm, isEnglish }) {
       <div style={{ fontSize: 12, fontWeight: 700, color: ac, marginBottom: 14 }}>
         {isEnglish ? "🔤 英単語登録" : "🖊️ 漢字登録"}
       </div>
+      <div style={{ marginBottom: 10 }}>
+        <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
+          {"問題文（" + (isEnglish ? "日本語の意味" : "ひらがな") + "）"}
+        </label>
+        <input value={form.wordQuestion} onChange={e => setForm(f => ({ ...f, wordQuestion: e.target.value }))}
+          placeholder={isEnglish ? "例: とうろく" : "例: かんじ"}
+          style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid " + bc,
+            fontSize: 15, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", color: ac }} />
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
           {"答え（" + (isEnglish ? "英単語" : "漢字") + "）"}
@@ -331,14 +343,6 @@ function WordForm({ form, setForm, isEnglish }) {
           style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e2e8f0",
             fontSize: 16, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", fontWeight: 700 }} />
       </div>
-      <div style={{ marginBottom: 10 }}>
-        <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-          {"問題文（" + (isEnglish ? "日本語の意味" : "ひらがな") + "）"}
-        </label>
-        <input value={form.wordQuestion} onChange={e => setForm(f => ({ ...f, wordQuestion: e.target.value }))}
-          placeholder={isEnglish ? "例: とうろく" : "例: かんじ"}
-          style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid " + bc,
-            fontSize: 15, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", color: ac }} />
         <div style={{ fontSize: 11, color: lc, marginTop: 3 }}>💡 キーボードで直接入力できます</div>
       </div>
       <div style={{ borderTop: "1px solid " + bc, paddingTop: 10 }}>
@@ -398,7 +402,8 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
   return (
     <div style={{ padding: 16 }}>
       {!editId && (
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
           {MODES.map(m => (
             <button key={m.key} onClick={() => setFormMode(m.key)}
               style={{ ...B, flex: 1, padding: "10px 4px", borderRadius: 12, fontSize: 12, fontWeight: 700, border: "2px solid",
@@ -409,6 +414,19 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
               <div style={{ fontSize: 10, fontWeight: 400, opacity: 0.7, marginTop: 2 }}>{m.desc}</div>
             </button>
           ))}
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+          {MODES2.map(m => (
+            <button key={m.key} onClick={() => setFormMode(m.key)}
+              style={{ ...B, flex: 1, padding: "10px 4px", borderRadius: 12, fontSize: 12, fontWeight: 700, border: "2px solid",
+                background: formMode === m.key ? "#1e3a5f" : "#fff",
+                color: formMode === m.key ? "#fff" : "#475569",
+                borderColor: formMode === m.key ? "#1e3a5f" : "#e2e8f0" }}>
+              <div>{m.label}</div>
+              <div style={{ fontSize: 10, fontWeight: 400, opacity: 0.7, marginTop: 2 }}>{m.desc}</div>
+            </button>
+          ))}
+          </div>
         </div>
       )}
       {formMode === "problem" && (
@@ -465,6 +483,8 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
       )}
       {formMode === "kanji" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
       {formMode === "english" && <WordForm form={form} setForm={setForm} isEnglish={true} />}
+      {formMode === "science" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
+      {formMode === "social" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
       {formMode === "problem" ? <SubjectSourceRow form={form} setForm={setForm} /> : <SubjectRow form={form} setForm={setForm} />}
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>間違えた日</label>
@@ -569,7 +589,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
         </div>
       )}
       {storageReady && filtered.map(p => {
-        const isWord = p.mode === "kanji" || p.mode === "english";
+        const isWord = p.mode === "kanji" || p.mode === "english" || p.mode === "science" || p.mode === "social";
         const statusColor = STATUSES.find(s => s.key === p.status)?.color || "#e2e8f0";
         const imp = IMPORTANCE.find(i => i.key === (p.importance || 1));
         const modeIcon = p.mode === "kanji" ? "🖊️" : p.mode === "english" ? "🔤" : "📝";
@@ -692,14 +712,14 @@ export default function App() {
     return () => clearTimeout(t);
   }, [problems, storageReady]);
 
-  const wordForm = formMode === "kanji" ? kanjiForm : englishForm;
-  const setWordForm = formMode === "kanji" ? setKanjiForm : setEnglishForm;
+  const wordForm = formMode === "kanji" || formMode === "science" || formMode === "social" ? kanjiForm : englishForm;
+  const setWordForm = formMode === "kanji" || formMode === "science" || formMode === "social" ? setKanjiForm : setEnglishForm;
 
   const handleSave = () => {
     const form = formMode === "problem" ? problemForm : wordForm;
     if (!form.subject) return alert("科目を選んでください");
     if (formMode === "problem" && !form.source) return alert("出どころを選んでください");
-    if ((formMode === "kanji" || formMode === "english") && !form.wordAnswer) return alert("答えを入力してください");
+    if ((formMode === "kanji" || formMode === "english" || formMode === "science" || formMode === "social") && !form.wordAnswer) return alert("答えを入力してください");
     const entry = { ...form, id: editId !== null ? editId : Date.now() };
     if (editId !== null) { setProblems(ps => ps.map(p => p.id === editId ? entry : p)); setEditId(null); }
     else { setProblems(ps => [...ps, entry]); setSelectedId(entry.id); }
