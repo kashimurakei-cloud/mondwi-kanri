@@ -176,12 +176,12 @@ function FlashPanel({ problem, onClose, onCycleStatus, onIncrementReview }) {
   );
 }
 
-function FlashCard({ problem, onClose, onReviewCountUp }) {
+function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
   const [phase, setPhase] = useState(0);
   const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   return (
-    <div onClick={() => { if (phase === 0) { setPhase(1); } else { onClose(); } }} style={{
+    <div onClick={() => { if (phase === 0) { setPhase(1); } else { onNext ? onNext() : onClose(); } }} style={{
       position: "fixed", inset: 0, zIndex: 2000,
       background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
@@ -845,7 +845,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif", minHeight:"100vh", background:"#f8fafc" }}>
-      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onReviewCountUp={incrementReview} />}
+      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = problems.findIndex(p => p.id === flashCard.id); const next = problems[idx + 1]; if (next) setFlashCard(next); else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
       {header}
       {tabs}
       {view==="add" && <div style={{ maxWidth:480, margin:"0 auto" }}><AddForm {...addFormProps} /></div>}
