@@ -153,7 +153,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#1a1a1a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
@@ -211,7 +211,7 @@ function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "50vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#1a1a1a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
