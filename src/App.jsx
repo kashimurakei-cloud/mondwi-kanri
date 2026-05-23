@@ -115,7 +115,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
   const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   const st = STATUSES.find(s => s.key === problem.status) || STATUSES[0];
-  useEffect(() => { setPhase(0); }, [problem.id]);
+  
   return (
     <div style={{
       width: "100%", height: "100%", borderRadius: 20, overflow: "hidden",
@@ -178,7 +178,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
 
 function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
   const [phase, setPhase] = useState(0);
-  useEffect(() => { setPhase(0); }, [problem.id]);
+  
   const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   return (
