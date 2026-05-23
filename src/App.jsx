@@ -42,6 +42,8 @@ const MODES = [
   { key: "problem", label: "📝 問題",   desc: "計算・読解など" },
   { key: "kanji",   label: "🖊️ 漢字",   desc: "漢字の読み書き" },
   { key: "english", label: "🔤 英単語", desc: "英単語・意味" },
+  { key: "science", label: "理科", desc: "理科の問題" },
+  { key: "social", label: "社会", desc: "社会の問題" },
 ];
 const IMPORTANCE = [
   { key: 1, label: "★",   desc: "普通",   color: "#94a3b8" },
@@ -465,6 +467,8 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
       )}
       {formMode === "kanji" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
       {formMode === "english" && <WordForm form={form} setForm={setForm} isEnglish={true} />}
+        {formMode === "science" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} />}
+        {formMode === "social" && <WordForm form={wordForm} setForm={setWordForm} isEnglish={false} />}
       {formMode === "problem" ? <SubjectSourceRow form={form} setForm={setForm} /> : <SubjectRow form={form} setForm={setForm} />}
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>間違えた日</label>
@@ -527,7 +531,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
       <div style={{ background: "#fff", borderRadius: 14, padding: 12, marginBottom: 14, boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 8 }}>フィルター／ソート</div>
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginBottom: 7 }}>
-          {[["全て","全て"],["problem","📝"],["kanji","🖊️"],["english","🔤"]].map(([k,l]) => (
+          {[["全て","全て"],["problem","📝"],["kanji","🖊️"],["english","🔤"],["science","🔬理科"],["social","🌏社会"]].map(([k,l]) => (
             <button key={k} onClick={() => setFilterMode(k)}
               style={{ ...B, padding: "4px 10px", borderRadius: 999, fontSize: 11, border: "1px solid",
                 background: filterMode===k?"#334155":"#f1f5f9", color: filterMode===k?"#fff":"#475569",
@@ -692,14 +696,14 @@ export default function App() {
     return () => clearTimeout(t);
   }, [problems, storageReady]);
 
-  const wordForm = formMode === "kanji" ? kanjiForm : englishForm;
-  const setWordForm = formMode === "kanji" ? setKanjiForm : setEnglishForm;
+  const wordForm = formMode === "kanji" ? kanjiForm : formMode === "science" || formMode === "social" ? kanjiForm : englishForm;
+  const setWordForm = formMode === "kanji" ? setKanjiForm : formMode === "science" || formMode === "social" ? setKanjiForm : setEnglishForm;
 
   const handleSave = () => {
     const form = formMode === "problem" ? problemForm : wordForm;
     if (!form.subject) return alert("科目を選んでください");
     if (formMode === "problem" && !form.source) return alert("出どころを選んでください");
-    if ((formMode === "kanji" || formMode === "english") && !form.wordAnswer) return alert("答えを入力してください");
+    if ((formMode === "kanji" || formMode === "english" || formMode === "science" || formMode === "social") && !form.wordAnswer) return alert("答えを入力してください");
     const entry = { ...form, id: editId !== null ? editId : Date.now() };
     if (editId !== null) { setProblems(ps => ps.map(p => p.id === editId ? entry : p)); setEditId(null); }
     else { setProblems(ps => [...ps, entry]); setSelectedId(entry.id); }
