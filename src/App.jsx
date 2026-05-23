@@ -147,13 +147,13 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
         style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, cursor: "pointer", textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
-            <div style={{ color: "#fff", fontSize: 40, fontWeight: 800, lineHeight: 1.5 }}>
+            <div style={{ color: "#1a1a1a", fontSize: 40, fontWeight: 800, lineHeight: 1.5 }}>
               {problem.wordQuestion || "（読みを登録してください）"}
             </div>
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#fff", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#1a1a1a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
@@ -205,13 +205,13 @@ function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
       <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
-            <div style={{ color: "#fff", fontSize: 28, fontWeight: 800, lineHeight: 1.5 }}>
+            <div style={{ color: "#1a1a1a", fontSize: 28, fontWeight: 800, lineHeight: 1.5 }}>
               {problem.wordQuestion || "（読みを登録してください）"}
             </div>
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "50vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#fff", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#1a1a1a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
