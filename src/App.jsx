@@ -552,7 +552,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
         </div>
         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
           <span style={{ fontSize: 11, color: "#94a3b8" }}>並替:</span>
-          {[["date","日付"],["importance","重要度"],["status","状態"]].map(([k,l]) => (
+          {[["date","日付"],["importance","重要度"],["status","状態"],["random","🔀ランダム"]].map(([k,l]) => (
             <button key={k} onClick={() => setSortKey(k)}
               style={{ ...B, padding: "4px 10px", borderRadius: 999, fontSize: 11, border: "1px solid",
                 background: sortKey===k?"#475569":"#f1f5f9", color: sortKey===k?"#fff":"#475569",
