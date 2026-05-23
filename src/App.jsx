@@ -172,6 +172,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
       <div style={{ textAlign: "center", padding: "0 20px 24px", fontSize: 12, color: "rgba(255,255,255,0.3)" }}>
         {phase === 0 ? "タップして答えを見る" : "タップして問題に戻る"}
       </div>
+    {toast && <div style={{ position:"fixed", top:24, left:"50%", transform:"translateX(-50%)", background:"#1e3a5f", color:"#fff", padding:"12px 24px", borderRadius:999, fontSize:15, fontWeight:700, zIndex:9999, boxShadow:"0 4px 16px rgba(0,0,0,0.2)" }}>{toast}</div>}
     </div>
   );
 }
@@ -704,7 +705,7 @@ export default function App() {
     if (editId !== null) { setProblems(ps => ps.map(p => p.id === editId ? entry : p)); setEditId(null); }
     else { setProblems(ps => [...ps, entry]); setSelectedId(entry.id); }
     setProblemForm(initialProblemForm); setKanjiForm(initialKanjiForm); setEnglishForm(initialEnglishForm);
-    setView("add");
+    setView("add"); setToast("✅ 登録しました！"); setTimeout(() => setToast(""), 2000);
   };
   const handleEdit = (p) => {
     const m = p.mode || "problem"; setFormMode(m);
