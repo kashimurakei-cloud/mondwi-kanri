@@ -120,7 +120,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
     <div style={{
       width: "100%", height: "100%", borderRadius: 20, overflow: "hidden",
       background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
-      display: "flex", flexDirection: "column", transition: "background .3s",
+      display: "flex", flexDirection: "column", transition: "none",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: "rgba(0,0,0,0.2)" }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -186,7 +186,7 @@ function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
       position: "fixed", inset: 0, zIndex: 2000,
       background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      padding: 24, cursor: "pointer", transition: "background .3s",
+      padding: 24, cursor: "pointer", transition: "none",
     }}>
       <button onClick={e => { e.stopPropagation(); onClose(); }}
         style={{ ...B, position: "absolute", top: 20, right: 20, background: "rgba(255,255,255,0.15)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>✕ 閉じる</button>
