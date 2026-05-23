@@ -846,7 +846,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif", minHeight:"100vh", background:"#f8fafc" }}>
-      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = filtered.findIndex(p => p.id === flashCard.id); const next = filtered[idx + 1]; if (next) { setFlashCard({...next, _reset: Date.now()}); } else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
+      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = filtered.findIndex(p => p.id === flashCard.id); const next = filtered[idx + 1]; if (next) setFlashCard(next); else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
       {header}
       {tabs}
       {view==="add" && <div style={{ maxWidth:480, margin:"0 auto" }}><AddForm {...addFormProps} /></div>}
