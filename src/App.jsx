@@ -665,7 +665,7 @@ export default function App() {
   const [filterSubject, setFilterSubject] = useState("全て");
   const [filterStatus, setFilterStatus] = useState("完了以外");
   const [filterMode, setFilterMode] = useState("全て");
-  const [sortKey, setSortKey] = useState("date");
+  const [sortKey, setSortKey] = useState("random");
   const [editId, setEditId] = useState(null);
   const [flashCard, setFlashCard] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
