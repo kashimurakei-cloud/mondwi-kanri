@@ -298,7 +298,7 @@ function SubjectSourceRow({ form, setForm }) {
   );
 }
 
-function WordForm({ form, setForm, isEnglish }) {
+function WordForm({ form, setForm, isEnglish, formMode }) {
   const [aiState, setAiState] = useState("idle");
   const handleAiConvert = async () => {
     if (!form.wordAnswer) return;
@@ -328,7 +328,7 @@ function WordForm({ form, setForm, isEnglish }) {
       </div>
       <div style={{ marginBottom: 10 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-          {"問題文（" + (isEnglish ? "日本語の意味" : "ひらがな") + "）"}
+          {"問題文" + (formMode === "science" || formMode === "social" ? "" : "（" + (isEnglish ? "日本語の意味" : "ひらがな") + "）")}
         </label>
         <input value={form.wordQuestion} onChange={e => setForm(f => ({ ...f, wordQuestion: e.target.value }))}
           placeholder={isEnglish ? "例: とうろく" : "例: かんじ"}
@@ -336,7 +336,7 @@ function WordForm({ form, setForm, isEnglish }) {
             fontSize: 15, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", color: ac }} />
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-          {"答え（" + (isEnglish ? "英単語" : "漢字") + "）"}
+          {"答え" + (formMode === "science" || formMode === "social" ? "" : "（" + (isEnglish ? "英単語" : "漢字") + "）")}
         </label>
         <input value={form.wordAnswer} onChange={e => setForm(f => ({ ...f, wordAnswer: e.target.value }))}
           placeholder={isEnglish ? "例: registration" : "例: 漢字"}
@@ -483,8 +483,8 @@ function AddForm({ editId, formMode, setFormMode, problemForm, setProblemForm, w
       )}
       {formMode === "kanji" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
       {formMode === "english" && <WordForm form={form} setForm={setForm} isEnglish={true} />}
-      {formMode === "science" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
-      {formMode === "social" && <WordForm form={form} setForm={setForm} isEnglish={false} />}
+      {formMode === "science" && <WordForm form={form} setForm={setForm} isEnglish={false} formMode={formMode} />}
+      {formMode === "social" && <WordForm form={form} setForm={setForm} isEnglish={false} formMode={formMode} />}
       {formMode === "problem" ? <SubjectSourceRow form={form} setForm={setForm} /> : <SubjectRow form={form} setForm={setForm} />}
       <div style={{ marginBottom: 12 }}>
         <label style={{ fontSize: 12, fontWeight: 700, color: "#475569", display: "block", marginBottom: 6 }}>間違えた日</label>
