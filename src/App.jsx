@@ -16,7 +16,13 @@ const db = getFirestore(app);
 const DOC_ID = "shared";
 
 async function saveProblems(problems) {
-  await setDoc(doc(db, "mondai", DOC_ID), { problems: JSON.stringify(problems) });
+  try {
+    console.log("Saving to Firestore...");
+    await setDoc(doc(db, "mondai", DOC_ID), { problems: JSON.stringify(problems) });
+    console.log("Saved successfully!");
+  } catch(e) {
+    console.error("Save error:", e.message);
+  }
 }
 async function loadProblems() {
   const snap = await getDoc(doc(db, "mondai", DOC_ID));
@@ -104,17 +110,17 @@ function StatusBadge({ status, onClick, small }) {
   );
 }
 
-function FlashPanel({ problem, onClose, onCycleStatus, onIncrementReview }) {
+function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview }) {
   const [phase, setPhase] = useState(0);
   const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   const st = STATUSES.find(s => s.key === problem.status) || STATUSES[0];
-  useEffect(() => { setPhase(0); }, [problem.id]);
+  
   return (
     <div style={{
       width: "100%", height: "100%", borderRadius: 20, overflow: "hidden",
-      background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
-      display: "flex", flexDirection: "column", transition: "background .3s",
+      background: "#ffffff", color: "#1a1a1a",
+      display: "flex", flexDirection: "column", transition: "none",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: "rgba(0,0,0,0.2)" }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -137,27 +143,27 @@ function FlashPanel({ problem, onClose, onCycleStatus, onIncrementReview }) {
       <div style={{ textAlign: "center", padding: "12px 0 0", fontSize: 12, color: "rgba(255,255,255,0.45)", letterSpacing: 3 }}>
         {phase === 0 ? "── 問 題 ──" : "── 答 え ──"}
       </div>
-      <div onClick={() => setPhase(ph => ph === 0 ? 1 : 0)}
+      <div onClick={() => setPhase(ph => { if (ph === 0) return 1; onNext ? onNext() : onClose(); return 0; })}
         style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, cursor: "pointer", textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
-            <div style={{ color: "#fff", fontSize: 40, fontWeight: 800, lineHeight: 1.5 }}>
+            <div style={{ color: "#1a1a1a", fontSize: 40, fontWeight: 800, lineHeight: 1.5 }}>
               {problem.wordQuestion || "（読みを登録してください）"}
             </div>
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#fff", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
         ) : (
           isWord ? (
-            <div style={{ color: "#86efac", fontSize: 52, fontWeight: 900 }}>{problem.wordAnswer}</div>
+            <div style={{ color: "#1a5c2a", fontSize: 52, fontWeight: 900 }}>{problem.wordAnswer}</div>
           ) : problem.answerPhoto ? (
             <img src={problem.answerPhoto} alt="答え" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#86efac", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 22, fontWeight: 700, lineHeight: 1.8 }}>
               {problem.memo || "（答えが登録されていません）"}
             </div>
           )
@@ -170,16 +176,17 @@ function FlashPanel({ problem, onClose, onCycleStatus, onIncrementReview }) {
   );
 }
 
-function FlashCard({ problem, onClose, onReviewCountUp }) {
+function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
   const [phase, setPhase] = useState(0);
+  
   const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   return (
-    <div onClick={() => { if (phase === 0) { setPhase(1); } else { onClose(); } }} style={{
+    <div onClick={() => { if (phase === 0) { setPhase(1); } else { onNext ? onNext() : onClose(); } }} style={{
       position: "fixed", inset: 0, zIndex: 2000,
-      background: phase === 0 ? "#1e3a5f" : "#0f4c2a",
+      background: "#ffffff", color: "#1a1a1a",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      padding: 24, cursor: "pointer", transition: "background .3s",
+      padding: 24, cursor: "pointer", transition: "none",
     }}>
       <button onClick={e => { e.stopPropagation(); onClose(); }}
         style={{ ...B, position: "absolute", top: 20, right: 20, background: "rgba(255,255,255,0.15)", color: "#fff", borderRadius: 999, padding: "6px 14px", fontSize: 13, fontWeight: 700 }}>✕ 閉じる</button>
@@ -198,23 +205,23 @@ function FlashCard({ problem, onClose, onReviewCountUp }) {
       <div style={{ width: "100%", maxWidth: 420, textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
-            <div style={{ color: "#fff", fontSize: 28, fontWeight: 800, lineHeight: 1.5 }}>
+            <div style={{ color: "#1a1a1a", fontSize: 28, fontWeight: 800, lineHeight: 1.5 }}>
               {problem.wordQuestion || "（読みを登録してください）"}
             </div>
           ) : problem.photo ? (
             <img src={problem.photo} alt="問題" style={{ maxWidth: "100%", maxHeight: "50vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#fff", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.transcription || problem.memo || "（問題文が登録されていません）"}
             </div>
           )
         ) : (
           isWord ? (
-            <div style={{ color: "#86efac", fontSize: 36, fontWeight: 900 }}>{problem.wordAnswer}</div>
+            <div style={{ color: "#1a5c2a", fontSize: 36, fontWeight: 900 }}>{problem.wordAnswer}</div>
           ) : problem.answerPhoto ? (
             <img src={problem.answerPhoto} alt="答え" style={{ maxWidth: "100%", maxHeight: "55vh", borderRadius: 12, objectFit: "contain" }} />
           ) : (
-            <div style={{ color: "#86efac", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
+            <div style={{ color: "#1a5c2a", fontSize: 18, fontWeight: 700, lineHeight: 1.7 }}>
               {problem.memo || "（答えが登録されていません）"}
             </div>
           )
@@ -545,7 +552,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
         </div>
         <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
           <span style={{ fontSize: 11, color: "#94a3b8" }}>並替:</span>
-          {[["date","日付"],["importance","重要度"],["status","状態"]].map(([k,l]) => (
+          {[["date","日付"],["importance","重要度"],["status","状態"],["random","🔀ランダム"]].map(([k,l]) => (
             <button key={k} onClick={() => setSortKey(k)}
               style={{ ...B, padding: "4px 10px", borderRadius: 999, fontSize: 11, border: "1px solid",
                 background: sortKey===k?"#475569":"#f1f5f9", color: sortKey===k?"#fff":"#475569",
@@ -658,9 +665,10 @@ export default function App() {
   const [filterSubject, setFilterSubject] = useState("全て");
   const [filterStatus, setFilterStatus] = useState("完了以外");
   const [filterMode, setFilterMode] = useState("全て");
-  const [sortKey, setSortKey] = useState("date");
+  const [sortKey, setSortKey] = useState("random");
   const [editId, setEditId] = useState(null);
   const [flashCard, setFlashCard] = useState(null);
+  const [toast, setToast] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [isTablet, setIsTablet] = useState(window.innerWidth >= 768);
 
@@ -696,7 +704,7 @@ export default function App() {
     if (editId !== null) { setProblems(ps => ps.map(p => p.id === editId ? entry : p)); setEditId(null); }
     else { setProblems(ps => [...ps, entry]); setSelectedId(entry.id); }
     setProblemForm(initialProblemForm); setKanjiForm(initialKanjiForm); setEnglishForm(initialEnglishForm);
-    setView("list");
+    setView("add"); window.scrollTo(0, 0); document.querySelectorAll("[style*=overflowY]").forEach(el => el.scrollTop = 0);
   };
   const handleEdit = (p) => {
     const m = p.mode || "problem"; setFormMode(m);
@@ -730,6 +738,7 @@ export default function App() {
     if (sortKey === "date") list.sort((a,b) => b.date.localeCompare(a.date));
     if (sortKey === "importance") list.sort((a,b) => (b.importance||1)-(a.importance||1));
     if (sortKey === "status") list.sort((a,b) => STATUSES.findIndex(s=>s.key===a.status)-STATUSES.findIndex(s=>s.key===b.status));
+    if (sortKey === 'random') list.sort(() => Math.random() - 0.5);
     return list;
   }, [problems, filterSubject, filterStatus, filterMode, sortKey]);
 
@@ -821,7 +830,7 @@ export default function App() {
           </div>
           <div style={{ flex:1, padding:20, overflow:"hidden" }}>
             {selectedProblem ? (
-              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
+              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onNext={() => { const idx = filtered.findIndex(p => p.id === selectedId); const next = filtered[idx + 1]; if (next) setSelectedId(next.id); else setSelectedId(null); }} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
             ) : (
               <div style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
                 <div style={{ textAlign:"center", color:"#94a3b8" }}>
@@ -839,7 +848,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif", minHeight:"100vh", background:"#f8fafc" }}>
-      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onReviewCountUp={incrementReview} />}
+      {flashCard && <FlashCard key={flashCard.id} problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = filtered.findIndex(p => p.id === flashCard.id); const next = filtered[idx + 1]; if (next) setFlashCard(next); else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
       {header}
       {tabs}
       {view==="add" && <div style={{ maxWidth:480, margin:"0 auto" }}><AddForm {...addFormProps} /></div>}
