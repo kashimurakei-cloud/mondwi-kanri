@@ -737,6 +737,7 @@ export default function App() {
     if (sortKey === "date") list.sort((a,b) => b.date.localeCompare(a.date));
     if (sortKey === "importance") list.sort((a,b) => (b.importance||1)-(a.importance||1));
     if (sortKey === "status") list.sort((a,b) => STATUSES.findIndex(s=>s.key===a.status)-STATUSES.findIndex(s=>s.key===b.status));
+    if (sortKey === 'random') list.sort(() => Math.random() - 0.5);
     return list;
   }, [problems, filterSubject, filterStatus, filterMode, sortKey]);
 
