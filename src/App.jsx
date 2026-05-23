@@ -119,7 +119,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
   return (
     <div style={{
       width: "100%", height: "100%", borderRadius: 20, overflow: "hidden",
-      background: "#1e3a5f",
+      background: "#ffffff",
       display: "flex", flexDirection: "column", transition: "none",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", background: "rgba(0,0,0,0.2)" }}>
@@ -184,7 +184,7 @@ function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
   return (
     <div onClick={() => { if (phase === 0) { setPhase(1); } else { onNext ? onNext() : onClose(); } }} style={{
       position: "fixed", inset: 0, zIndex: 2000,
-      background: "#1e3a5f",
+      background: "#ffffff",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       padding: 24, cursor: "pointer", transition: "none",
     }}>
