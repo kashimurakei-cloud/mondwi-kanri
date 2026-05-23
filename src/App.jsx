@@ -112,7 +112,7 @@ function StatusBadge({ status, onClick, small }) {
 
 function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview }) {
   const [phase, setPhase] = useState(0);
-  const isWord = problem.mode === "kanji" || problem.mode === "english";
+  const isWord = problem.mode === "kanji" || problem.mode === "english" || problem.mode === "science" || problem.mode === "social";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   const st = STATUSES.find(s => s.key === problem.status) || STATUSES[0];
   
@@ -179,7 +179,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
 function FlashCard({ problem, onClose, onNext, onReviewCountUp }) {
   const [phase, setPhase] = useState(0);
   
-  const isWord = problem.mode === "kanji" || problem.mode === "english";
+  const isWord = problem.mode === "kanji" || problem.mode === "english" || problem.mode === "science" || problem.mode === "social";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
   return (
     <div onClick={() => { if (phase === 0) { setPhase(1); } else { onNext ? onNext() : onClose(); } }} style={{
@@ -569,7 +569,7 @@ function ProblemList({ filtered, storageReady, filterSubject, setFilterSubject, 
         </div>
       )}
       {storageReady && filtered.map(p => {
-        const isWord = p.mode === "kanji" || p.mode === "english";
+        const isWord = p.mode === "kanji" || p.mode === "english" || p.mode === "science" || p.mode === "social";
         const statusColor = STATUSES.find(s => s.key === p.status)?.color || "#e2e8f0";
         const imp = IMPORTANCE.find(i => i.key === (p.importance || 1));
         const modeIcon = p.mode === "kanji" ? "🖊️" : p.mode === "english" ? "🔤" : "📝";
