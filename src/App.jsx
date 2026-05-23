@@ -704,7 +704,7 @@ export default function App() {
     if (editId !== null) { setProblems(ps => ps.map(p => p.id === editId ? entry : p)); setEditId(null); }
     else { setProblems(ps => [...ps, entry]); setSelectedId(entry.id); }
     setProblemForm(initialProblemForm); setKanjiForm(initialKanjiForm); setEnglishForm(initialEnglishForm);
-    setView("add"); setToast("✅ 登録しました！"); setTimeout(() => setToast(""), 2000);
+    setView("add"); window.scrollTo(0, 0);
   };
   const handleEdit = (p) => {
     const m = p.mode || "problem"; setFormMode(m);
