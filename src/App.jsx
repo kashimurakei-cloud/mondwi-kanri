@@ -143,7 +143,7 @@ function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview
       <div style={{ textAlign: "center", padding: "12px 0 0", fontSize: 12, color: "rgba(255,255,255,0.45)", letterSpacing: 3 }}>
         {phase === 0 ? "── 問 題 ──" : "── 答 え ──"}
       </div>
-      <div onClick={() => setPhase(ph => ph === 0 ? 1 : 0)}
+      <div onClick={() => setPhase(ph => { if (ph === 0) return 1; onNext ? onNext() : onClose(); return 0; })}
         style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 40, cursor: "pointer", textAlign: "center" }}>
         {phase === 0 ? (
           isWord ? (
@@ -827,7 +827,7 @@ export default function App() {
           </div>
           <div style={{ flex:1, padding:20, overflow:"hidden" }}>
             {selectedProblem ? (
-              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onNext={() => { const idx = problems.findIndex(p => p.id === selectedId); const next = problems[idx + 1]; if (next) setSelectedId(next.id); else setSelectedId(null); }} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
+              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onNext={() => { const idx = problems.findIndex(p => p.id === selectedId); const next = problems[idx + 1]; if (next) { setSelectedId(null); setTimeout(() => setSelectedId(next.id), 50); } else setSelectedId(null); }} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
             ) : (
               <div style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
                 <div style={{ textAlign:"center", color:"#94a3b8" }}>
@@ -845,7 +845,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif", minHeight:"100vh", background:"#f8fafc" }}>
-      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = problems.findIndex(p => p.id === flashCard.id); const next = problems[idx + 1]; if (next) setFlashCard(next); else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
+      {flashCard && <FlashCard problem={flashCard} onClose={() => setFlashCard(null)} onNext={() => { const idx = problems.findIndex(p => p.id === flashCard.id); const next = problems[idx + 1]; if (next) { setFlashCard(null); setTimeout(() => setFlashCard(next), 50); } else setFlashCard(null); }} onReviewCountUp={incrementReview} />}
       {header}
       {tabs}
       {view==="add" && <div style={{ maxWidth:480, margin:"0 auto" }}><AddForm {...addFormProps} /></div>}
