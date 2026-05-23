@@ -331,7 +331,7 @@ function WordForm({ form, setForm, isEnglish, formMode }) {
           {"問題文" + (formMode === "science" || formMode === "social" ? "" : "（" + (isEnglish ? "日本語の意味" : "ひらがな") + "）")}
         </label>
         <input value={form.wordQuestion} onChange={e => setForm(f => ({ ...f, wordQuestion: e.target.value }))}
-          placeholder={isEnglish ? "例: とうろく" : "例: かんじ"}
+          placeholder={isEnglish ? "例: とうろく" : (formMode === "science" || formMode === "social" ? "" : "例: かんじ")}
           style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid " + bc,
             fontSize: 15, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", color: ac }} />
       <div style={{ marginBottom: 12 }}>
@@ -339,7 +339,7 @@ function WordForm({ form, setForm, isEnglish, formMode }) {
           {"答え" + (formMode === "science" || formMode === "social" ? "" : "（" + (isEnglish ? "英単語" : "漢字") + "）")}
         </label>
         <input value={form.wordAnswer} onChange={e => setForm(f => ({ ...f, wordAnswer: e.target.value }))}
-          placeholder={isEnglish ? "例: registration" : "例: 漢字"}
+          placeholder={isEnglish ? "例: registration" : (formMode === "science" || formMode === "social" ? "" : "例: 漢字")}
           style={{ width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid #e2e8f0",
             fontSize: 16, fontFamily: "inherit", boxSizing: "border-box", background: "#fff", fontWeight: 700 }} />
       </div>
