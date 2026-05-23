@@ -110,7 +110,7 @@ function StatusBadge({ status, onClick, small }) {
   );
 }
 
-function FlashPanel({ problem, onClose, onCycleStatus, onIncrementReview }) {
+function FlashPanel({ problem, onClose, onNext, onCycleStatus, onIncrementReview }) {
   const [phase, setPhase] = useState(0);
   const isWord = problem.mode === "kanji" || problem.mode === "english";
   const imp = IMPORTANCE.find(i => i.key === (problem.importance || 1));
@@ -827,7 +827,7 @@ export default function App() {
           </div>
           <div style={{ flex:1, padding:20, overflow:"hidden" }}>
             {selectedProblem ? (
-              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
+              <FlashPanel problem={selectedProblem} onClose={() => setSelectedId(null)} onNext={() => { const idx = problems.findIndex(p => p.id === selectedId); const next = problems[idx + 1]; if (next) setSelectedId(next.id); else setSelectedId(null); }} onCycleStatus={cycleStatus} onIncrementReview={incrementReview} />
             ) : (
               <div style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"center", background:"#fff", borderRadius:20, boxShadow:"0 1px 6px rgba(0,0,0,0.06)" }}>
                 <div style={{ textAlign:"center", color:"#94a3b8" }}>
